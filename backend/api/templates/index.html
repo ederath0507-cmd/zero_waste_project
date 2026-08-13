@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Waste - Marketplace Profesional</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- NOTIFICACIÓN TOAST (ALERTA FLOTANTE) -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <span id="toast-mensaje" class="text-sm font-semibold">¡Acción realizada con éxito!</span>
+    </div>
+
+    <!-- NAVBAR SUPERIOR -->
+    <nav class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+        <div class="flex items-center gap-4">
+            <!-- Botón de las 3 rayitas para abrir el menú lateral -->
+            <button onclick="toggleMenu()" class="text-gray-600 text-xl hover:text-green-600 focus:outline-none transition">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <a href="/" class="flex items-center gap-2 font-bold text-2xl text-green-600">
+                <i class="fa-solid fa-leaf"></i> Zero Waste
+            </a>
+        </div>
+
+        <!-- BARRA DE BÚSQUEDA RÁPIDA EN VIVO -->
+        <div class="hidden md:flex flex-1 max-w-md mx-6">
+            <div class="relative w-full">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3 text-gray-400 text-sm"></i>
+                <input type="text" id="input-busqueda" onkeyup="filtrarAlimentosBusqueda()" placeholder="Buscar pan, verduras, comercios en Altamira..." class="w-full bg-gray-100 pl-10 pr-4 py-2 rounded-full text-sm border border-transparent focus:border-green-500 focus:bg-white focus:outline-none transition">
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- Geolocalización activa -->
+            <button onclick="obtenerUbicacion()" class="hidden lg:flex items-center gap-2 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-full transition">
+                <i class="fa-solid fa-location-crosshairs text-green-600"></i>
+                <span id="txt-ubicacion">Altamira, TAM (GPS)</span>
+            </button>
+
+            <!-- Botón Iniciar Sesión / Registro -->
+            <button onclick="abrirModalAuth()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-2 rounded-full text-xs transition">
+                <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+            </button>
+
+            <!-- Botón Publicar / Vender -->
+            <a href="/publicar/" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-full flex items-center gap-2 shadow-sm transition text-sm">
+                <i class="fa-solid fa-plus"></i> Publicar
+            </a>
+
+            <!-- Botón Perfil -->
+            <a href="/perfil/" class="text-gray-600 text-2xl hover:text-green-600 transition" title="Mi Perfil">
+                <i class="fa-solid fa-circle-user"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- MENÚ LATERAL DESPLEGABLE (3 RAYITAS) -->
+    <div id="sidebar-menu" class="hidden fixed inset-0 bg-black/50 z-50 transition-opacity">
+        <div class="w-80 bg-white h-full shadow-2xl p-6 flex flex-col justify-between overflow-y-auto">
+            <div>
+                <!-- Cabecera del Menú Lateral -->
+                <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                    <div class="flex items-center gap-2 font-bold text-xl text-green-600">
+                        <i class="fa-solid fa-leaf"></i> Zero Waste
+                    </div>
+                    <button onclick="toggleMenu()" class="text-gray-400 hover:text-gray-600 text-xl focus:outline-none">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Opciones de Navegación del Menú Lateral -->
+                <nav class="mt-4 flex flex-col gap-1">
+                    <a href="/" class="flex items-center gap-3 px-4 py-3 text-green-700 bg-green-50 rounded-xl font-semibold transition">
+                        <i class="fa-solid fa-store w-5 text-center"></i> Volver a Marketplace
+                    </a>
+                    <a href="/publicar/" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-xl font-medium transition">
+                        <i class="fa-solid fa-shop w-5 text-center"></i> Registrarse para Vender
+                    </a>
+                    <a href="/perfil/" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-xl font-medium transition">
+                        <i class="fa-solid fa-user w-5 text-center"></i> Mi Perfil / Registro
+                    </a>
+                    <button onclick="toggleChat()" class="flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-xl font-medium transition w-full text-left">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-comments w-5 text-center"></i> Chat Mensajes</span>
+                        <span class="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">3</span>
+                    </button>
+
+                    <div class="my-2 border-t border-gray-100"></div>
+
+                    <!-- Panel de Administración -->
+                    <a href="/admin/" target="_blank" class="flex items-center gap-3 px-4 py-3 text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-xl font-semibold transition">
+                        <i class="fa-solid fa-user-shield w-5 text-center"></i> Panel Administrador
+                    </a>
+
+                    <a href="/informacion/" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-xl font-medium transition">
+                        <i class="fa-solid fa-circle-info w-5 text-center"></i> Sobre El Proyecto
+                    </a>
+                    <a href="/configuracion/" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-green-600 rounded-xl font-medium transition">
+                        <i class="fa-solid fa-gear w-5 text-center"></i> Ajustes
+                    </a>
+                </nav>
+            </div>
+
+            <!-- CRÉDITOS CON LOS 4 DESARROLLADORES -->
+            <div class="border-t border-gray-100 pt-4 text-xs text-gray-500">
+                <p class="font-bold text-gray-700 mb-1">Equipo Desarrollador:</p>
+                <p>• Emmanuel Zavala Ramírez</p>
+                <p>• Eder Arnulfo Torres Hernández</p>
+                <p>• Edwin Mireles Ventura</p>
+                <p>• Juan Pablo López Romano</p>
+                <p class="text-gray-400 mt-2 text-[10px]">UPALT - ITI 2026 &copy;</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-6 py-8 flex-1">
+        
+        <!-- BANNER HEADER CON MÉTRICAS AMBIENTALES -->
+        <div class="bg-gradient-to-r from-emerald-600 to-green-700 rounded-3xl p-6 md:p-8 text-white mb-8 shadow-md relative overflow-hidden">
+            <div class="relative z-10 max-w-3xl">
+                <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Altamira Sustentable</span>
+                <h1 class="text-2xl md:text-4xl font-extrabold mt-2 mb-2">Rescata comida, ahorra dinero y protege el planeta</h1>
+                <p class="text-green-100 text-sm md:text-base mb-6">Conectamos comercios locales con consumidores para reducir el desperdicio alimentario.</p>
+                
+                <!-- MÉTRICAS DE IMPACTO -->
+                <div class="grid grid-cols-3 gap-4 border-t border-white/20 pt-4">
+                    <div>
+                        <p class="text-2xl font-black text-amber-300">+180 kg</p>
+                        <p class="text-[11px] text-green-100">Alimentos Rescatados</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-amber-300">-340 kg</p>
+                        <p class="text-[11px] text-green-100">CO₂ Evitado</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-black text-amber-300">+42</p>
+                        <p class="text-[11px] text-green-100">Comercios Unidos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BARRA DE FILTROS AVANZADOS Y SLIDER GPS -->
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- Categorías -->
+            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+                <button onclick="filtrarCategoria('Todos')" class="btn-cat bg-slate-800 text-white px-4 py-1.5 rounded-full font-medium text-xs shadow-sm">Todos</button>
+                <button onclick="filtrarCategoria('Pan')" class="btn-cat bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full font-medium text-xs hover:bg-gray-200 transition">🍞 Panadería</button>
+                <button onclick="filtrarCategoria('Verduras')" class="btn-cat bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full font-medium text-xs hover:bg-gray-200 transition">🥑 Frutas/Verduras</button>
+                <button onclick="filtrarCategoria('Platillos')" class="btn-cat bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full font-medium text-xs hover:bg-gray-200 transition">🍲 Platillos</button>
+                <button onclick="filtrarCategoria('Lácteos')" class="btn-cat bg-gray-100 text-gray-700 px-4 py-1.5 rounded-full font-medium text-xs hover:bg-gray-200 transition">🥛 Lácteos</button>
+            </div>
+
+            <!-- Slider Radio Distancia (GPS) -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 text-xs">
+                <span class="font-semibold text-gray-600"><i class="fa-solid fa-street-view text-green-600"></i> Radio Máx:</span>
+                <input type="range" id="slider-distancia" min="1" max="10" value="10" oninput="actualizarDistancia(this.value)" class="accent-green-600 cursor-pointer">
+                <span id="val-distancia" class="font-bold text-green-600 w-12">10 km</span>
+            </div>
+        </div>
+
+        <!-- GRID DE TARJETAS DE ALIMENTOS -->
+        <div id="grid-alimentos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- Tarjeta 1 -->
+            <div class="tarjeta-alimento bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition flex flex-col justify-between" data-titulo="caja de pan fresco" data-categoria="Pan" data-distancia="1.5">
+                <div>
+                    <div class="relative h-48 bg-gray-200 cursor-pointer" onclick="abrirModalDetalle('Caja de Pan Fresco', 'Panadería El Mejor Pan', 'GRATIS', '1.5 km', 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600', 'Surtido variado de conchas, bolillos y donas del día en perfecto estado.')">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600" class="w-full h-full object-cover" alt="Pan">
+                        <span class="absolute top-3 left-3 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">GRATIS</span>
+                        <span class="absolute top-3 right-3 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full">Stock: 2 cajas</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg text-gray-800 mb-1">Caja de Pan Fresco</h3>
+                        <p class="text-gray-500 text-sm mb-1"><i class="fa-solid fa-location-dot text-red-500"></i> Panadería El Mejor Pan (Centro)</p>
+                        <p class="text-gray-400 text-xs mb-3"><i class="fa-solid fa-route"></i> 1.5 km de ti</p>
+                        <p class="text-red-500 text-xs font-semibold"><i class="fa-regular fa-clock"></i> Recoger antes de las 8:00 PM</p>
+                    </div>
+                </div>
+                <div class="px-5 pb-5 flex gap-2">
+                    <button onclick="toggleChat()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold p-2.5 rounded-xl transition text-sm" title="Chat">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </button>
+                    <button onclick="solicitarRecogida('Caja de Pan Fresco', 'Panadería El Mejor Pan')" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                        Solicitar Recogida
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjeta 2 -->
+            <div class="tarjeta-alimento bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition flex flex-col justify-between" data-titulo="bolsa sorpresa verduras" data-categoria="Verduras" data-distancia="3.2">
+                <div>
+                    <div class="relative h-48 bg-gray-200 cursor-pointer" onclick="abrirModalDetalle('Bolsa Sorpresa Verduras', 'Plaza de Altamira', '$50 MXN', '3.2 km', 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=600', 'Bolsa con tomates, cebollas y calabacines ideales para cocinar hoy.')">
+                        <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=600" class="w-full h-full object-cover" alt="Verduras">
+                        <span class="absolute top-3 left-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">$50 MXN</span>
+                        <span class="absolute top-3 right-3 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full">Stock: 5 bolsas</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg text-gray-800 mb-1">Bolsa Sorpresa Verduras</h3>
+                        <p class="text-gray-500 text-sm mb-1"><i class="fa-solid fa-location-dot text-red-500"></i> Plaza de Altamira</p>
+                        <p class="text-gray-400 text-xs mb-3"><i class="fa-solid fa-route"></i> 3.2 km de ti</p>
+                        <p class="text-red-500 text-xs font-semibold"><i class="fa-regular fa-clock"></i> Recoger antes de las 4:00 PM</p>
+                    </div>
+                </div>
+                <div class="px-5 pb-5 flex gap-2">
+                    <button onclick="toggleChat()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold p-2.5 rounded-xl transition text-sm" title="Chat">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </button>
+                    <button onclick="solicitarRecogida('Bolsa Sorpresa Verduras', 'Plaza de Altamira')" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                        Solicitar Recogida
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3 -->
+            <div class="tarjeta-alimento bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition flex flex-col justify-between" data-titulo="excedente buffet boda" data-categoria="Platillos" data-distancia="6.0">
+                <div>
+                    <div class="relative h-48 bg-gray-200 cursor-pointer" onclick="abrirModalDetalle('Excedente Buffet Boda', 'Hs Hotel Hotsson', 'GRATIS', '6.0 km', 'https://images.unsplash.com/photo-1555244162-803834f70033?w=600', 'Bandejas preparadas de guisados de banquete sin servir. En excelente temperatura.')">
+                        <img src="https://images.unsplash.com/photo-1555244162-803834f70033?w=600" class="w-full h-full object-cover" alt="Buffet">
+                        <span class="absolute top-3 left-3 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">GRATIS</span>
+                        <span class="absolute top-3 right-3 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full">Stock: 1 porción</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg text-gray-800 mb-1">Excedente Buffet Boda</h3>
+                        <p class="text-gray-500 text-sm mb-1"><i class="fa-solid fa-location-dot text-red-500"></i> Hs Hotel Hotsson</p>
+                        <p class="text-gray-400 text-xs mb-3"><i class="fa-solid fa-route"></i> 6.0 km de ti</p>
+                        <p class="text-red-600 text-xs font-bold"><i class="fa-solid fa-triangle-exclamation"></i> ¡Urgente! Recoger YA</p>
+                    </div>
+                </div>
+                <div class="px-5 pb-5 flex gap-2">
+                    <button onclick="toggleChat()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold p-2.5 rounded-xl transition text-sm" title="Chat">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </button>
+                    <button onclick="solicitarRecogida('Excedente Buffet Boda', 'Hs Hotel Hotsson')" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                        Solicitar Recogida
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjeta 4 -->
+            <div class="tarjeta-alimento bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition flex flex-col justify-between" data-titulo="caja de tomates maduros" data-categoria="Verduras" data-distancia="2.1">
+                <div>
+                    <div class="relative h-48 bg-gray-200 cursor-pointer" onclick="abrirModalDetalle('Caja de Tomates Maduros', 'Verdulería San José', 'GRATIS', '2.1 km', 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600', 'Tomates rojos listos para purés o guisados.')">
+                        <img src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600" class="w-full h-full object-cover" alt="Tomates">
+                        <span class="absolute top-3 left-3 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">GRATIS</span>
+                        <span class="absolute top-3 right-3 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full">Stock: 3 cajas</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg text-gray-800 mb-1">Caja de Tomates Maduros</h3>
+                        <p class="text-gray-500 text-sm mb-1"><i class="fa-solid fa-location-dot text-red-500"></i> Verdulería San José</p>
+                        <p class="text-gray-400 text-xs mb-3"><i class="fa-solid fa-route"></i> 2.1 km de ti</p>
+                        <p class="text-red-500 text-xs font-semibold"><i class="fa-regular fa-clock"></i> Recoger hoy antes de las 6:00 PM</p>
+                    </div>
+                </div>
+                <div class="px-5 pb-5 flex gap-2">
+                    <button onclick="toggleChat()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold p-2.5 rounded-xl transition text-sm" title="Chat">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </button>
+                    <button onclick="solicitarRecogida('Caja de Tomates Maduros', 'Verdulería San José')" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                        Solicitar Recogida
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjeta 5 -->
+            <div class="tarjeta-alimento bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition flex flex-col justify-between" data-titulo="lote de lacteos variados" data-categoria="Lácteos" data-distancia="4.0">
+                <div>
+                    <div class="relative h-48 bg-gray-200 cursor-pointer" onclick="abrirModalDetalle('Lote de Lácteos Variados', 'Abarrotes La Estación', '$38 MXN', '4.0 km', 'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?w=600', 'Yogurt, quesos y cremas próximos a vencer pero frescos.')">
+                        <img src="https://images.unsplash.com/photo-1528751014936-863e6e7a319c?w=600" class="w-full h-full object-cover" alt="Lácteos">
+                        <span class="absolute top-3 left-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">$38 MXN</span>
+                        <span class="absolute top-3 right-3 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full">Stock: 4 packs</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg text-gray-800 mb-1">Lote de Lácteos Variados</h3>
+                        <p class="text-gray-500 text-sm mb-1"><i class="fa-solid fa-location-dot text-red-500"></i> Abarrotes La Estación</p>
+                        <p class="text-gray-400 text-xs mb-3"><i class="fa-solid fa-route"></i> 4.0 km de ti</p>
+                        <p class="text-red-500 text-xs font-semibold"><i class="fa-regular fa-clock"></i> Recoger antes de mañana</p>
+                    </div>
+                </div>
+                <div class="px-5 pb-5 flex gap-2">
+                    <button onclick="toggleChat()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold p-2.5 rounded-xl transition text-sm" title="Chat">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </button>
+                    <button onclick="solicitarRecogida('Lote de Lácteos Variados', 'Abarrotes La Estación')" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                        Solicitar Recogida
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjeta 6 -->
+            <div class="tarjeta-alimento bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition flex flex-col justify-between" data-titulo="costal de naranjas jugosas" data-categoria="Verduras" data-distancia="0.8">
+                <div>
+                    <div class="relative h-48 bg-gray-200 cursor-pointer" onclick="abrirModalDetalle('Costal de Naranjas Jugosas', 'Mercado Municipal', 'GRATIS', '0.8 km', 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=600', 'Naranjas ideales para jugos frescos del día.')">
+                        <img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=600" class="w-full h-full object-cover" alt="Naranjas">
+                        <span class="absolute top-3 left-3 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">GRATIS</span>
+                        <span class="absolute top-3 right-3 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full">Stock: 1 costal</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-lg text-gray-800 mb-1">Costal de Naranjas Jugosas</h3>
+                        <p class="text-gray-500 text-sm mb-1"><i class="fa-solid fa-location-dot text-red-500"></i> Mercado Municipal de Altamira</p>
+                        <p class="text-gray-400 text-xs mb-3"><i class="fa-solid fa-route"></i> 0.8 km de ti</p>
+                        <p class="text-red-500 text-xs font-semibold"><i class="fa-regular fa-clock"></i> Recoger hoy mismo</p>
+                    </div>
+                </div>
+                <div class="px-5 pb-5 flex gap-2">
+                    <button onclick="toggleChat()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold p-2.5 rounded-xl transition text-sm" title="Chat">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </button>
+                    <button onclick="solicitarRecogida('Costal de Naranjas Jugosas', 'Mercado Municipal')" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                        Solicitar Recogida
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL GENERADOR DE TOKEN Y RECOGIDA (CONFIRMACIÓN) -->
+    <div id="modal-token" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+            <button onclick="cerrarModalToken()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="fa-solid fa-qrcode"></i>
+            </div>
+            <h3 class="font-bold text-xl text-gray-800">¡Reserva Confirmada!</h3>
+            <p class="text-xs text-gray-500 mt-1">Muestra este código al llegar al comercio:</p>
+            
+            <div class="bg-gray-100 border border-dashed border-gray-300 rounded-2xl p-4 my-4">
+                <p class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Código de Recogida</p>
+                <p id="codigo-generado" class="text-3xl font-black text-green-600 tracking-wider my-1">ZW-9824</p>
+                <p id="comercio-reserva" class="text-xs font-semibold text-gray-700">Panadería El Mejor Pan</p>
+            </div>
+
+            <button onclick="cerrarModalToken()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl text-sm transition">
+                Entendido y Guardar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE DEL ALIMENTO -->
+    <div id="modal-detalle" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative">
+            <button onclick="cerrarModalDetalle()" class="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full hover:bg-black transition z-10"><i class="fa-solid fa-xmark"></i></button>
+            <img id="det-img" src="" class="w-full h-48 object-cover">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span id="det-precio" class="bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-md">GRATIS</span>
+                    <span id="det-distancia" class="text-xs text-gray-400"><i class="fa-solid fa-route"></i> 1.5 km</span>
+                </div>
+                <h3 id="det-titulo" class="font-bold text-xl text-gray-800">Título</h3>
+                <p id="det-comercio" class="text-xs font-semibold text-green-600 mb-3"><i class="fa-solid fa-store"></i> Comercio</p>
+                <p id="det-desc" class="text-xs text-gray-600 mb-4">Descripción detallada del alimento.</p>
+                
+                <button onclick="solicitarRecogidaDetalle()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl text-sm transition">
+                    Solicitar Recogida Ahora
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LOGIN / REGISTRO -->
+    <div id="modal-auth" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl relative">
+            <button onclick="cerrarModalAuth()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="font-bold text-xl text-gray-800 mb-1">Iniciar Sesión</h3>
+            <p class="text-xs text-gray-500 mb-4">Accede como Comercio o Consumidor</p>
+            <form onsubmit="ejecutarLogin(event)" class="space-y-3">
+                <input type="email" placeholder="Correo Electrónico" required class="w-full bg-gray-100 px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:border-green-600">
+                <input type="password" placeholder="Contraseña" required class="w-full bg-gray-100 px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:border-green-600">
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- WIDGET FLOTANTE CHAT (CLIENTE - VENDEDOR) -->
+    <div id="chat-widget" class="fixed bottom-6 right-6 z-50">
+        <button onclick="toggleChat()" class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-2xl flex items-center gap-2 transition font-bold">
+            <i class="fa-solid fa-comments text-xl"></i>
+            <span class="hidden md:inline">Chat</span>
+        </button>
+
+        <div id="chat-box" class="hidden absolute bottom-16 right-0 w-80 bg-white border rounded-2xl shadow-2xl overflow-hidden flex flex-col h-96">
+            <div class="bg-green-600 text-white p-3 flex items-center justify-between">
+                <p class="font-bold text-xs"><i class="fa-solid fa-store"></i> Panadería El Mejor Pan</p>
+                <button onclick="toggleChat()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex-1 p-3 overflow-y-auto space-y-2 bg-gray-50 text-xs">
+                <div class="bg-gray-200 p-2 rounded-lg max-w-[80%]">¡Hola! ¿Aún disponible?</div>
+                <div class="bg-green-600 text-white p-2 rounded-lg max-w-[80%] ml-auto text-right">¡Sí! Pasa antes de las 8:00 PM.</div>
+            </div>
+            <div class="p-2 border-t bg-white flex gap-1">
+                <input type="text" placeholder="Escribe..." class="flex-1 bg-gray-100 rounded-lg px-2 py-1 text-xs border focus:outline-none">
+                <button onclick="mostrarToast('Mensaje enviado')" class="bg-green-600 text-white px-3 py-1 rounded-lg text-xs"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER CON CRÉDITOS OFICIALES Y NOMBRES COMPLETOS -->
+    <footer class="bg-slate-900 text-gray-300 py-10 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <div class="flex items-center gap-2 font-bold text-2xl text-green-500 mb-3">
+                    <i class="fa-solid fa-leaf"></i> Zero Waste
+                </div>
+                <p class="text-xs text-gray-400">Plataforma tecnológica para la gestión sustentable de alimentos sobrantes en Altamira, Tamaulipas.</p>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-white text-sm mb-3">Navegación</h4>
+                <ul class="space-y-1.5 text-xs">
+                    <li><a href="/" class="hover:text-green-400 transition"><i class="fa-solid fa-angle-right"></i> Marketplace</a></li>
+                    <li><a href="/publicar/" class="hover:text-green-400 transition"><i class="fa-solid fa-angle-right"></i> Vender / Donar</a></li>
+                    <li><a href="/admin/" target="_blank" class="hover:text-purple-400 transition"><i class="fa-solid fa-angle-right"></i> Admin Control</a></li>
+                </ul>
+            </div>
+
+            <!-- NOMBRES COMPLETOS DE LOS 4 DESARROLLADORES -->
+            <div>
+                <h4 class="font-bold text-white text-sm mb-3"><i class="fa-solid fa-code text-green-500"></i> Desarrolladores</h4>
+                <ul class="space-y-1 text-xs text-gray-300">
+                    <li>👨‍💻 Emmanuel Zavala Ramírez</li>
+                    <li>👨‍💻 Eder Arnulfo Torres Hernández</li>
+                    <li>👨‍💻 Edwin Mireles Ventura</li>
+                    <li>👨‍💻 Juan Pablo López Romano</li>
+                </ul>
+                <p class="text-[10px] text-gray-500 mt-3">Ingeniería en Tecnologías de la Información — UPALT 2026</p>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 border-t border-slate-800 mt-8 pt-4 text-center text-xs text-gray-500">
+            Zero Waste &copy; 2026. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <!-- LÓGICA DE INTERACCIÓN JAVASCRIPT -->
+    <script>
+        let productoSeleccionadoActual = {};
+
+        function toggleMenu() { document.getElementById('sidebar-menu').classList.toggle('hidden'); }
+        function toggleChat() { document.getElementById('chat-box').classList.toggle('hidden'); }
+        function abrirModalAuth() { document.getElementById('modal-auth').classList.remove('hidden'); }
+        function cerrarModalAuth() { document.getElementById('modal-auth').classList.add('hidden'); }
+
+        function mostrarToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-mensaje').innerText = msg;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => { toast.classList.add('translate-x-full'); }, 3000);
+        }
+
+        function ejecutarLogin(e) {
+            e.preventDefault();
+            cerrarModalAuth();
+            mostrarToast("Sesión iniciada con éxito");
+        }
+
+        function solicitarRecogida(titulo, comercio) {
+            const token = "ZW-" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('codigo-generado').innerText = token;
+            document.getElementById('comercio-reserva').innerText = comercio;
+            document.getElementById('modal-token').classList.remove('hidden');
+        }
+
+        function cerrarModalToken() {
+            document.getElementById('modal-token').classList.add('hidden');
+            mostrarToast("Reserva guardada en tu historial");
+        }
+
+        function abrirModalDetalle(titulo, comercio, precio, distancia, img, desc) {
+            productoSeleccionadoActual = { titulo, comercio };
+            document.getElementById('det-titulo').innerText = titulo;
+            document.getElementById('det-comercio').innerText = comercio;
+            document.getElementById('det-precio').innerText = precio;
+            document.getElementById('det-distancia').innerText = distancia;
+            document.getElementById('det-img').src = img;
+            document.getElementById('det-desc').innerText = desc;
+            document.getElementById('modal-detalle').classList.remove('hidden');
+        }
+
+        function cerrarModalDetalle() { document.getElementById('modal-detalle').classList.add('hidden'); }
+
+        function solicitarRecogidaDetalle() {
+            cerrarModalDetalle();
+            solicitarRecogida(productoSeleccionadoActual.titulo, productoSeleccionadoActual.comercio);
+        }
+
+        function filtrarAlimentosBusqueda() {
+            const q = document.getElementById('input-busqueda').value.toLowerCase();
+            document.querySelectorAll('.tarjeta-alimento').forEach(t => {
+                const titulo = t.getAttribute('data-titulo');
+                t.style.display = titulo.includes(q) ? 'flex' : 'none';
+            });
+        }
+
+        function filtrarCategoria(cat) {
+            document.querySelectorAll('.tarjeta-alimento').forEach(t => {
+                if(cat === 'Todos' || t.getAttribute('data-categoria') === cat) {
+                    t.style.display = 'flex';
+                } else {
+                    t.style.display = 'none';
+                }
+            });
+        }
+
+        function actualizarDistancia(val) {
+            document.getElementById('val-distancia').innerText = val + " km";
+            document.querySelectorAll('.tarjeta-alimento').forEach(t => {
+                const dist = parseFloat(t.getAttribute('data-distancia'));
+                t.style.display = (dist <= parseFloat(val)) ? 'flex' : 'none';
+            });
+        }
+
+        function obtenerUbicacion() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    document.getElementById('txt-ubicacion').innerText = `GPS: (${pos.coords.latitude.toFixed(2)}, ${pos.coords.longitude.toFixed(2)})`;
+                    mostrarToast("Ubicación GPS sincronizada");
+                });
+            }
+        }
+
+        // Carga dinámica extra desde la API de Django si hay registros creados
+        async function cargarAlimentosAPI() {
+            try {
+                const response = await fetch('/alimentos/');
+                if (response.ok) {
+                    const datos = await response.json();
+                    if (datos && datos.length > 0) {
+                        const grid = document.getElementById('grid-alimentos');
+                        const tarjetasAPI = datos.map(item => `
+                            <div class="tarjeta-alimento bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition flex flex-col justify-between" data-titulo="${item.titulo.toLowerCase()}" data-categoria="${item.categoria || 'Todos'}" data-distancia="1.0">
+                                <div>
+                                    <div class="relative h-48 bg-gray-200 cursor-pointer" onclick="abrirModalDetalle('${item.titulo}', '${item.ubicacion || 'Altamira, Centro'}', '${item.precio > 0 ? '$' + item.precio + ' MXN' : 'GRATIS'}', '1.0 km', '${item.imagen_url || 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600'}', '${item.descripcion || 'Alimento disponible para recolección.'}')">
+                                        <img src="${item.imagen_url || 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600'}" class="w-full h-full object-cover" alt="${item.titulo}">
+                                        <span class="absolute top-3 left-3 ${item.precio > 0 ? 'bg-amber-500' : 'bg-emerald-500'} text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
+                                            ${item.precio > 0 ? '$' + item.precio + ' MXN' : 'GRATIS'}
+                                        </span>
+                                    </div>
+                                    <div class="p-5">
+                                        <h3 class="font-bold text-lg text-gray-800 mb-1">${item.titulo}</h3>
+                                        <p class="text-gray-500 text-sm mb-1"><i class="fa-solid fa-location-dot text-red-500"></i> ${item.ubicacion || 'Altamira, Centro'}</p>
+                                        <p class="text-gray-400 text-xs mb-3"><i class="fa-solid fa-route"></i> Cercano a ti</p>
+                                        <p class="text-red-500 text-xs font-semibold"><i class="fa-regular fa-clock"></i> Recoger hoy</p>
+                                    </div>
+                                </div>
+                                <div class="px-5 pb-5 flex gap-2">
+                                    <button onclick="toggleChat()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold p-2.5 rounded-xl transition text-sm" title="Chat">
+                                        <i class="fa-solid fa-comment-dots"></i>
+                                    </button>
+                                    <button onclick="solicitarRecogida('${item.titulo}', '${item.ubicacion || 'Centro'}')" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                                        Solicitar Recogida
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('');
+                        grid.insertAdjacentHTML('afterbegin', tarjetasAPI);
+                    }
+                }
+            } catch (e) {
+                console.log("Cargando vista local con datos por defecto.");
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', cargarAlimentosAPI);
+    </script>
+</body>
+</html>

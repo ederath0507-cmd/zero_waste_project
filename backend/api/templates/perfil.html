@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Waste - Mi Perfil</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2ecc71; /* Verde claro */
+            --dark: #2c3e50; /* Azul oscuro */
+            --light: #ecf0f1; /* Blanco hueso */
+            --danger: #e74c3c; /* Rojo brillante */
+            --card-bg: #ffffff; /* Blanco */
+            --bg-body: #f1f3f6; /* Fondo gris claro de la imagen */
+            --btn-red: #ff4d40; /* Naranja/Rojo de la imagen */
+            --text-muted: #7f8c8d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* FUENTES */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--dark);
+        }
+
+        /* NAVEGADOR SUPERIOR */
+        header {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 15px; 
+        }
+
+        #menuBtn {
+            color: var(--dark);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+        #menuBtn:hover { color: var(--primary); }
+
+        .user-menu {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-post {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-post:hover { background-color: #27ae60; }
+
+        /* MENÚ LATERAL (SIDEBAR) */
+        .sidebar {
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: -280px; 
+            width: 280px;
+            height: 100vh;
+            background-color: white;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .sidebar.active { left: 0; }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: var(--dark);
+            padding: 15px 10px;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover {
+            color: var(--primary);
+            padding-left: 15px; 
+            background-color: #f8f9fa;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- NUEVOS ESTILOS DEL PERFIL --- */
+        .profile-container {
+            display: flex;
+            gap: 25px;
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            align-items: flex-start;
+        }
+
+        .profile-card {
+            background-color: var(--card-bg);
+            border-radius: 4px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        }
+
+        /* Lado Izquierdo: Resumen */
+        .profile-sidebar-card {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .profile-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .profile-username {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .avatar-edit-icon {
+            position: absolute;
+            top: 0;
+            right: -5px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .btn-action {
+            background-color: var(--btn-red);
+            color: white;
+            border: none;
+            padding: 10px 0;
+            width: 100%;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .btn-action:hover {
+            background-color: #e63e32;
+        }
+
+        .upload-guidelines {
+            background-color: #f6f8fb;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #555;
+            width: 100%;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            border: 1px solid #edf1f7;
+        }
+
+        .member-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Lado Derecho: Formulario */
+        .profile-form-card {
+            flex: 2.5;
+        }
+
+        .profile-form-card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 25px;
+            border-bottom: 1px solid #edf1f7;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding-bottom: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--dark);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #4285f4; /* Azul de selección */
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .input-group input {
+            padding: 12px 15px;
+            border: 1px solid #e2e6ea;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--dark);
+            outline: none;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-group input:focus {
+            border-color: #4285f4;
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .input-with-icon input {
+            width: 100%;
+            padding-left: 45px;
+        }
+
+        .input-with-icon .fa-facebook { color: #3b5998; }
+        .input-with-icon .fa-twitter { color: #1da1f2; }
+
+        .btn-update {
+            background-color: var(--btn-red);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-update:hover {
+            background-color: #e63e32;
+        }
+
+        /* ESTILOS DEL FOOTER */
+        footer { 
+            text-align: center; 
+            margin-top: 40px; 
+            background-color: #e0e0e0; 
+            padding: 35px; 
+            border-radius: 10px;
+            max-width: 1200px;
+            margin: 40px auto; 
+        }
+
+        /* MEDIA QUERIES PARA CELULARES */
+        @media (max-width: 768px) {
+            .profile-container {
+                flex-direction: column;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div id="overlay" class="overlay"></div>
+    
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span>Menú</span>
+            <i class="fas fa-times" id="closeBtn" style="cursor: pointer; color: var(--dark);"></i>
+        </div>
+        
+        <a href="index.html">
+            <i class="fas fa-store"></i> Volver al Marketplace
+        </a>
+
+        <a href="informacion.html">
+            <i class="fas fa-info-circle"></i> Sobre el Proyecto
+        </a>
+        
+        <a href="perfil.html">
+            <i class="fas fa-user"></i> Mi Perfil
+        </a>
+        <a href="configuracion.html">
+            <i class="fas fa-cog"></i> Configuración
+        </a>
+    </nav>
+
+    <header>
+        <div class="logo">
+            <i class="fas fa-bars" id="menuBtn"></i>
+            <i class="fas fa-leaf"></i><a href="mercado.html" style="color: #2ecc71; text-decoration: none;">Zero Waste</a>
+        </div>
+        <div class="user-menu">
+            <a href="publicar.html" class="btn-post">
+                <i class="fas fa-plus"></i> Publicar Alimento
+            </a>
+            <a href="perfil.html" style="color: #2ecc71; text-decoration: none;">
+                <i class="fas fa-user-circle" style="font-size: 24px; color: #7f8c8d; cursor: pointer;"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="profile-container">
+        
+        <aside class="profile-card profile-sidebar-card">
+            <h3 class="profile-name">Jose Prez</h3>
+            <p class="profile-username">@j.perez25</p>
+            
+            <div class="avatar-container">
+                <img src="https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cGVyZmlsfGVufDB8fDB8fHww" alt="Foto de perfil">
+                <div class="avatar-edit-icon">
+                    <i class="fas fa-trash-alt"></i> </div>
+            </div>
+
+            <button class="btn-action">Subir Nueva Foto</button>
+
+            <div class="upload-guidelines">
+                Sube un nuevo avatar. Las imágenes grandes se redimensionarán automáticamente.<br><br>
+                El tamaño máximo es de 1 MB.
+            </div>
+
+            <p class="member-date">Miembro desde: 15 Enero 2026</p>
+        </aside>
+
+        <section class="profile-card profile-form-card">
+            <h2>Editar Perfil</h2>
+            
+            <div class="tabs">
+                <span class="tab active">Información de Usuario</span>
+            </div>
+
+            <form action="#" method="POST">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" placeholder="Jose Perez">
+                    </div>
+                    <div class="input-group">
+                        <label>Nombre de Usuario</label>
+                        <input type="text" placeholder="j.perez25">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="input-group">
+                        <label>Confirmar Correo Electrónico</label>
+                        <input type="email" placeholder="correo@ejemplo.com">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Contraseña</label>
+                        <input type="password" placeholder="••••••••••••">
+                    </div>
+                    <div class="input-group">
+                        <label>Confirmar Contraseña</label>
+                        <input type="password" placeholder="••••••••••••">
+                    </div>
+                </div>
+
+                <button type="button" class="btn-update">Actualizar info</button>
+            </form>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Proyecto Zero Waste. Desarrollado por: Edwin Mireles, Eder Torres y Emmanuel Zavala.</p>
+    </footer>
+
+    <script>
+        const menuBtn = document.getElementById('menuBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        closeBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+
+</body>
+</html>

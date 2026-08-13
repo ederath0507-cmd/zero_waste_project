@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Waste - Sobre el proyecto</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Ajusté el margen del body a 0 para que la barra superior toque los bordes */
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; line-height: 1.5; color: #333; background-color: #f8f9fa;}
+        
+        /* Contenedor para que tu texto no se pegue a las orillas */
+        .contenido-principal { margin: 25px auto; max-width: 900px; padding: 0 20px; }
+
+        /* --- ESTILOS DEL ENCABEZADO (Traídos del código 1) --- */
+        header {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2ecc71; /* Verde de tu logo original */
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #menuBtn {
+            color: #2c3e50;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+        #menuBtn:hover { color: #2ecc71; }
+
+        .user-menu {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-post {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-post:hover { background-color: #27ae60; }
+
+        /* --- ESTILOS DEL MENÚ LATERAL --- */
+        .sidebar {
+            box-sizing: border-box;
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100vh;
+            background-color: white; box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+            transition: left 0.3s ease; z-index: 1000; display: flex;
+            flex-direction: column; padding: 20px; text-align: left;
+        }
+        .sidebar.active { left: 0; }
+        
+        .sidebar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; font-size: 1.2rem; color: #2ecc71; font-weight: bold;
+        }
+        
+        .sidebar a {
+            text-decoration: none; color: #333; padding: 15px 10px; font-size: 1.1rem; 
+            border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; transition: 0.2s;
+        }
+        .sidebar a:hover { color: #2ecc71; padding-left: 15px; background-color: #f9f9f9; }
+        
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 999;
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- ESTILOS DEL CONTENIDO DE LA PÁGINA --- */
+        /* Convertí tu antiguo header verde en un banner de bienvenida */
+        .banner-bienvenida { 
+            text-align: center; 
+            background-color: #2ecc71; 
+            color: white; 
+            padding: 30px 15px; 
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .banner-bienvenida h1 { margin-top: 0; }
+        
+        section { margin: 20px 0; }
+        h2 { color: #2ecc71; }
+        h3 { color: #333; margin-left: 10px;}
+        ul { list-style-type: square ; margin-left: 20px; }
+        footer { text-align: center; margin-top: 40px; background-color: #e0e0e0; padding: 15px; border-radius: 10px;}
+    </style>
+</head>
+
+<body>
+    
+    <div id="overlay" class="overlay"></div>
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span>Menú</span>
+            <i class="fas fa-times" id="closeBtn" style="cursor: pointer; color: #333;"></i>
+        </div>
+        
+        <a href="index.html">
+            <i class="fas fa-store"></i> Volver al Marketplace
+        </a>
+
+        <a href="informacion.html">
+            <i class="fas fa-info-circle"></i> Sobre el Proyecto
+        </a>
+        
+        <a href="perfil.html">
+            <i class="fas fa-user"></i> Mi Perfil
+        </a>
+        <a href="configuracion.html">
+            <i class="fas fa-cog"></i> Configuración
+        </a>
+
+    </nav>
+
+    <header>
+        <div class="logo">
+            <i class="fas fa-bars" id="menuBtn"></i>
+            <i class="fas fa-leaf"></i><a href="mercado.html" style="color: #2ecc71; text-decoration: none;">Zero Waste</a>
+        </div>
+        <div class="user-menu">
+            <a href="publicar.html" class="btn-post">
+                <i class="fas fa-plus"></i> Publicar Alimento
+            </a>
+            <a href="perfil.html" style="color: #2ecc71; text-decoration: none;">
+                <i class="fas fa-user-circle" style="font-size: 24px; color: #7f8c8d; cursor: pointer;"></i>
+            </a>
+        </div>
+    </header>
+
+    <div class="contenido-principal">
+        
+        <div class="banner-bienvenida">
+            <h1>Zero Waste</h1>
+            <p><i>"Alimentos sin desperdicio"</i></p>
+            <p>Conectando comercios locales con usuarios para reducir el desperdicio alimentario y fomentar la economía circular.</p>
+        </div>
+
+        <section id="introduccion">
+            <h2>¿Qué es el Sistema Zero Waste?</h2>
+            <p>Zero Waste es una plataforma web tipo marketplace diseñada para mitigar el desperdicio de alimentos en entornos urbanos. Nuestro sistema conecta a comercios locales (restaurantes, panaderías, fruterías) que disponen de excedentes de alimentos aptos para el consumo, con usuarios finales interesados en adquirirlos a precios reducidos.</p>
+        </section>
+        
+        <hr>
+        
+        <section id="concepto">
+            <h2>El concepto</h2>
+            <p>
+                Nuestra principal iniciativa es la <strong>Publicación Específica (Estilo Marketplace)</strong>.
+                El local tiene tiempo y publica exactamente lo que le sobró con su respectiva foto, precio o si es gratis,
+                la direccion del local o algun otro tipo de punto de recollecion y el tiempo que tiene el cliente para reocger el producto antes de que se heche a perder.
+                <blockquote><b>Ejemplo:</b> "$100mxn, 3 pizzas grandes de pepperoni, Dominos,
+                Blvd. Ignacio Allende, recoger antes de las 5:00pm"</blockquote>
+                
+                La idea secundaria es la <strong>Bolsa Sorpresa</strong>.
+                Consiste en una unidad de venta que contiene un mix de productos excedentes del día,
+                cuyo contenido exacto , no se conoce hasta el momento de la recogida en el local o al men.
+                <blockquote><b>Ejemplo:</b> Es imposible predecir exactamente qué va a sobrar.
+                Un día pueden sobrar 5 conchas de vainilla y 2 bolillos, y al día siguiente 3 rebanadas de pastel y 1 baguette.</blockquote>
+            </p>
+        </section>
+        
+        <hr>
+        
+        <section id="funcionalidades">
+            <h2>¿Cómo funciona?</h2>
+            
+            <h3>Módulo para Clientes (Consumidores)</h3>
+            <ul>
+                <li>Búsqueda y filtrado de comercios locales utilizando geolocalización desde el navegador.</li>
+                <li>Reserva y compra en efectivo o cpmpra electrónica segura de la publicación y "Bolsas Sorpresa".</li>
+                <li>Visualización de métricas de impacto ambiental, incluyendo el cálculo de la reducción de tu huella de carbono personal.</li>
+            </ul>
+
+            <h3>Módulo para Comercios (Administración)</h3>
+            <ul>
+                <li>Gestión de inventario diario para publicar y actualizar la disponibilidad de alimentos.</li>
+                <li>Panel de control con análisis de ventas y visualización de ingresos recuperados.</li>
+                <li>Validación rápida de comprobantes de reserva al momento de la entrega.</li>
+            </ul>
+        </section>
+        
+        <hr>
+        
+        <section id="proposito">
+            <h2>Nuestro Propósito e Impacto</h2>
+            <ul>
+                <li><strong>Impacto Ambiental:</strong> Reducir el volumen de alimentos orgánicos desechados en vertederos y disminuir las emisiones de gases de efecto invernadero (GEI).</li>
+                <li><strong>Impacto Social:</strong> Democratizar el acceso a alimentos de calidad mediante la reducción de costos para el consumidor final.</li>
+                <li><strong>Impacto Económico:</strong> Facilitar la recuperación de costos de producción para los negocios locales, transformando sus pérdidas en ingresos marginales.</li>
+            </ul>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Proyecto Zero Waste. Desarrollado por: Edwin Mireles, Eder Torres y Emmanuel Zavala.</p>
+        </footer>
+        
+    </div> <script>
+        const menuBtn = document.getElementById('menuBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        closeBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+</body>
+</html>
